@@ -5,7 +5,7 @@ from rana import Rana
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-SCREEN_WIDTH = 1100
+SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
 
 pygame.init()
@@ -16,7 +16,7 @@ clock = pygame.time.Clock()
 frogList = []
 
 ################################################################# SETTINGS #################################################################
-FROG_NUMBER = 11  # OF EACH COLOR (+ 1)
+FROG_NUMBER = 10  # OF EACH COLOR (+ 1)
 FRAMERATE = 120  # HZ
 SPEED = 5  # FROG SPEED
 ############################################################################################################################################
@@ -106,7 +106,7 @@ def init():
 
 # Scambia due elementi nella lista (per mantenerla ordinata e facilitare le operazioni)
 def swap(idxA, idxB):
-    print(f"{frogList[idxA].id}, {frogList[idxB].id}")
+    # print(f"{frogList[idxA].id}, {frogList[idxB].id}")
     frogList[idxA], frogList[idxB] = frogList[idxB], frogList[idxA]
     # Vengono scambiati anche gli id delle rane in modo che siano ordinati all'interno della lista
     frogList[idxA].id, frogList[idxB].id = frogList[idxB].id, frogList[idxA].id
@@ -143,11 +143,11 @@ def handle(event: pygame.event.Event):
         if event.button == 1:
             idx = overlap()
             try:
-                print(f"idx --> {idx}")
+                # print(f"idx --> {idx}")
 
                 # Controllo correttezza -> se la rana selezionata può spostarsi lo fa
                 if frogList[idx].color == 1 and (frogList[idx + 1].empty or (frogList[idx + 1].color == 0 and frogList[idx + 2].empty)):
-                    print(idx)
+                    # print(idx)
                     Rana.moving = True
                     frogList[idx].selected = True
                     if frogList[idx + 1].empty:
@@ -155,7 +155,7 @@ def handle(event: pygame.event.Event):
                     else:
                         swap(idx, idx + 2)
                 elif frogList[idx].color == 0 and (frogList[idx - 1].empty or (frogList[idx - 1].color == 1 and frogList[idx - 2].empty)):
-                    print(idx)
+                    # print(idx)
                     Rana.moving = True
                     frogList[idx].selected = True
                     if frogList[idx - 1].empty:
@@ -163,7 +163,8 @@ def handle(event: pygame.event.Event):
                     else:
                         swap(idx, idx - 2)
             except:
-                print("Out of bound")
+                # print("Out of bound")
+                return
 
 
 # Scorre la lista da sinistra e trova la prima rana che si può muovere
@@ -172,7 +173,7 @@ def moveLeft():
         if frogList[len(frogList) - 1 - i].color == 0:
             try:
                 if frogList[len(frogList) - 2 - i].empty == True or (frogList[len(frogList) - 2 - i].color == 1 and frogList[len(frogList) - 3 - i].empty == True):
-                    print(f"moving Left {len(frogList) - 1 - i}")
+                    # print(f"moving Left {len(frogList) - 1 - i}")
                     Rana.moving = True
                     frogList[len(frogList) - 1 - i].selected = True
                     if frogList[len(frogList) - 2 - i].empty:
@@ -181,7 +182,8 @@ def moveLeft():
                         swap(len(frogList) - 1 - i, len(frogList) - 3 - i)
                     return
             except:
-                print("Out of range moveLeft")
+                # print("Out of range moveLeft")
+                continue
 
 
 # Scorre la lista da destra e trova la prima rana che si può muovere
@@ -190,7 +192,7 @@ def moveRight():
         if frogList[i].color == 1:
             try:
                 if frogList[i + 1].empty == True or (frogList[i + 1].color == 0 and frogList[i + 2].empty == True):
-                    print(f"moving right {i}")
+                    # print(f"moving right {i}")
                     Rana.moving = True
                     frogList[i].selected = True
                     if frogList[i + 1].empty:
@@ -199,7 +201,8 @@ def moveRight():
                         swap(i, i + 2)
                     return
             except:
-                print("Out of range moveRight")
+                # print("Out of range moveRight")
+                continue
 
 
 # Autocompletamento
@@ -292,7 +295,8 @@ def fillBorders():
 # Funzione principale
 def game():
     init()
-
+    print(
+        f"Ci vorranno {(Rana.counter + 1) * Rana.counter + Rana.counter * 3} mosse")
     left = True
     reaching = 1
     idx = 0

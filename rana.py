@@ -1,3 +1,4 @@
+from math import sqrt
 import pygame
 
 BLACK = (0, 0, 0)
@@ -91,9 +92,15 @@ class Rana(object):
     @staticmethod
     # Inizializza tutti i valori statici in base alle dimensioni dello schermo ed il numero di rane
     def initRows(width, height):
-        Rana.rows = (Rana.counter // (Rana.maxRowSize + 1)) + 1
-        if Rana.rows % 2 == 0:
-            Rana.rows += 1
+        if Rana.counter <= Rana.maxRowSize:
+            Rana.rows = 1
+        elif Rana.counter <= Rana.maxRowSize * 5:
+            Rana.rows = (Rana.counter // (Rana.maxRowSize + 1)) + 1
+            if Rana.rows % 2 == 0:
+                Rana.rows += 1
+        else:
+            # Se il numero è troppo grande ottimizza le dimensioni delle righe in base alle proporzioni dello schermo
+            Rana.rows = round(sqrt((height * Rana.counter) / width))
 
         Rana.rowSize = Rana.counter // Rana.rows
         Rana.centralSup = Rana.counter - Rana.rows * Rana.rowSize
