@@ -1,4 +1,4 @@
-import time
+from time import sleep
 import pygame
 from rana import Rana
 
@@ -22,11 +22,13 @@ SPEED = 5  # FROG SPEED
 ############################################################################################################################################
 
 
+# Ridimensionamento delle immagini
 def smooth():
     for i in range(len(frogList)):
         frogList[i].smooth()
 
 
+# Inizializza tutte le posizioni delle rane in base ai parametri settati da Rana.initRows()
 def initPos():
     gridList = []
     Rana.initRows(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -39,47 +41,57 @@ def initPos():
     add = 0
     if Rana.centralSup != 0:
         add = 1
-    print(f"add {add}")
-    print(f"Size {len(frogList)}")
-    print(f"Counter {Rana.counter}")
-    print(f"Rows {Rana.rows}")
-    print(f"RowSize {Rana.rowSize}")
-    print(f"Central {Rana.centralSup}")
-    print(f"top {topShortRows}")
-    print(f"bot {botShortRows}")
-    print(f"RanaSize {Rana.size}")
-    print(f"yPos {yPos}")
+
+    # ----------------------------------------------
+    # print(f"add {add}")
+    # print(f"Size {len(frogList)}")
+    # print(f"Counter {Rana.counter}")
+    # print(f"Rows {Rana.rows}")
+    # print(f"RowSize {Rana.rowSize}")
+    # print(f"Central {Rana.centralSup}")
+    # print(f"top {topShortRows}")
+    # print(f"bot {botShortRows}")
+    # print(f"RanaSize {Rana.size}")
+    # print(f"yPos {yPos}")
+    # ----------------------------------------------
+
+    # Righe non piene (spazio vuoto a sinistra)
     for i in range(topShortRows):
         for j in range(Rana.rowSize):
             frogList[counter].pos = [Rana.offset + Rana.size * (j + add), yPos]
             gridList.append([frogList[counter].pos[0],
                             frogList[counter].pos[1]])
             counter += 1
-            print(f"1, Riga {i}, counter {counter-1}")
+            # print(f"1, Riga {i}, counter {counter-1}")
         yPos += Rana.size
+
+    # Righe piene
     for i in range(topShortRows, Rana.rows - botShortRows):
         for j in range(Rana.rowSize + add):
             frogList[counter].pos = [Rana.offset + Rana.size * j, yPos]
             gridList.append([frogList[counter].pos[0],
                             frogList[counter].pos[1]])
             counter += 1
-            print(f"2, Riga {i}, counter {counter-1}")
+            # print(f"2, Riga {i}, counter {counter-1}")
         yPos += Rana.size
+
+    # Righe non piene (spazio vuoto a destra)
     for i in range(botShortRows):
         for j in range(Rana.rowSize):
             frogList[counter].pos = [Rana.offset + Rana.size * j, yPos]
             gridList.append([frogList[counter].pos[0],
                             frogList[counter].pos[1]])
             counter += 1
-            print(f"3, Riga {i}, counter {counter-1}")
+            # print(f"3, Riga {i}, counter {counter-1}")
         yPos += Rana.size
 
-    for i in range(len(gridList)):
-        print(f"{gridList[i][0]}, {gridList[i][1]}")
+    # for i in range(len(gridList)):
+    #     print(f"{gridList[i][0]}, {gridList[i][1]}")
 
     Rana.gridList = gridList
 
 
+# Creazione rane
 def init():
     Rana.speed = SPEED
     for i in range(FROG_NUMBER * 2 + 1):
@@ -92,12 +104,15 @@ def init():
     initPos()
 
 
+# Scambia due elementi nella lista (per mantenerla ordinata e facilitare le operazioni)
 def swap(idxA, idxB):
     print(f"{frogList[idxA].id}, {frogList[idxB].id}")
     frogList[idxA], frogList[idxB] = frogList[idxB], frogList[idxA]
+    # Vengono scambiati anche gli id delle rane in modo che siano ordinati all'interno della lista
     frogList[idxA].id, frogList[idxB].id = frogList[idxB].id, frogList[idxA].id
 
 
+# Disegna sullo schermo la griglia e le rane
 def draw():
     for i in range(len(Rana.gridList)):
         pygame.draw.rect(
@@ -106,6 +121,7 @@ def draw():
         frogList[i].draw(screen)
 
 
+# Trova la rana selezionata in base alla posizione del mouse
 def overlap():
     for i in range(len(frogList)):
         if (pygame.mouse.get_pos()[0] > frogList[i].pos[0] and pygame.mouse.get_pos()[0] < frogList[i].pos[0] + Rana.size) and (pygame.mouse.get_pos()[1] > frogList[i].pos[1] and pygame.mouse.get_pos()[1] < frogList[i].pos[1] + Rana.size):
@@ -113,19 +129,23 @@ def overlap():
     return -1
 
 
+# Aggiorna le posizioni di tutte le rane
 def update():
     for i in range(FROG_NUMBER * 2 + 1):
         frogList[i].update()
 
 
+# Gestione degli input
 def handle(event: pygame.event.Event):
-    if event.type == pygame.QUIT:
+    if event.type == pygame.QUIT:  # Chiusura
         pygame.quit()
-    elif event.type == pygame.MOUSEBUTTONDOWN and not Rana.moving:
+    elif event.type == pygame.MOUSEBUTTONDOWN and not Rana.moving:  # Pressione pulsante
         if event.button == 1:
             idx = overlap()
             try:
                 print(f"idx --> {idx}")
+
+                # Controllo correttezza -> se la rana selezionata può spostarsi lo fa
                 if frogList[idx].color == 1 and (frogList[idx + 1].empty or (frogList[idx + 1].color == 0 and frogList[idx + 2].empty)):
                     print(idx)
                     Rana.moving = True
@@ -146,6 +166,7 @@ def handle(event: pygame.event.Event):
                 print("Out of bound")
 
 
+# Scorre la lista da sinistra e trova la prima rana che si può muovere
 def moveLeft():
     for i in range(len(frogList)):
         if frogList[len(frogList) - 1 - i].color == 0:
@@ -163,6 +184,7 @@ def moveLeft():
                 print("Out of range moveLeft")
 
 
+# Scorre la lista da destra e trova la prima rana che si può muovere
 def moveRight():
     for i in range(len(frogList)):
         if frogList[i].color == 1:
@@ -180,17 +202,20 @@ def moveRight():
                 print("Out of range moveRight")
 
 
+# Autocompletamento
 def complete(vars):
     global FROG_NUMBER
-    left = vars[0]
-    reaching = vars[1]
-    idx = vars[2]
-    ascending = vars[3]
+    left = vars[0]  # Tipo di rana da spostare
+    reaching = vars[1]  # Numero di spostamenti da raggiungere
+    idx = vars[2]  # Indice di spostamenti (per ogni numero da raggiungere)
+    ascending = vars[3]  # Incremento / decremento
+    # Contatore dei cicli completi (1,2,3 - 0 se non raggiunto o superato)
     maxCount = vars[4]
-    done = vars[5]
+    done = vars[5]  # Finito (termina il programma)
 
     # print(f"Vars {vars}, frogs {FROG_NUMBER}")
 
+    # Se non ha raggiunto il numero massimo (FROG_NUMBER) o lo ha già superato
     if maxCount == 0:
         if left:
             moveLeft()
@@ -243,6 +268,8 @@ def complete(vars):
                 idx = 0
                 left = True
                 maxCount = (maxCount + 1) % 4
+
+    # Aggiornamento variabili
     vars[0] = left
     vars[1] = reaching
     vars[2] = idx
@@ -251,6 +278,7 @@ def complete(vars):
     vars[5] = done
 
 
+# Riempie i bordi laterali per coprire le immagini che che escono dalla griglia (passando ad un' altra riga)
 def fillBorders():
     pygame.draw.rect(screen, WHITE, (0, 0, Rana.offset, SCREEN_HEIGHT))
     add = 0
@@ -261,27 +289,37 @@ def fillBorders():
                      SCREEN_WIDTH - startPoint, SCREEN_HEIGHT))
 
 
+# Funzione principale
 def game():
     init()
+
     left = True
     reaching = 1
     idx = 0
     ascending = True
     maxCount = 0
     done = False
+
+    # Per poter modificare le variabili all'interno di complete()
     vars = [left, reaching, idx, ascending, maxCount, done]
-    while not vars[5] or Rana.moving:  # done
+
+    # Finché non ha finito (anche di muoversi)
+    while not vars[5] or Rana.moving:
         for event in pygame.event.get():
             handle(event)
+
         if not Rana.moving:
             complete(vars)
+
         screen.fill(WHITE)
         update()
         draw()
         fillBorders()
+
         pygame.display.update()
         clock.tick(FRAMERATE)
-    time.sleep(3)
+
+    sleep(3)
 
 
 game()
